@@ -9,6 +9,7 @@
     "user-filter": ".*users|TestTakers.*.csv",
     "groups": ["OAT", "NSA"],
     "users_per_test": 100,
+    "password_size": 8,
     "version": "1.x",
     "uri": "https://ltnec.taocloud.org/#MAR21"
   },
@@ -19,9 +20,10 @@
     "aggregated-user-file": "output/invalsi/users_aggregated.csv",
     "aggregated-assignment-file": "output/invalsi/assignments_aggregated.csv",
     "aggregated-line-item-file": "output/invalsi/line_items_aggregated.csv",
-    "groups": ["QA", "OAT", "NSA"],
+    "groups": ["QA", "OAT", "INVALSI"],
     "users_per_test": 100,
-    "version": "2.x",
+    "password_size": 8,
+    "version": "1.x",
     "uri": "https://www.invalsi.org#Spring21"
   }
 }

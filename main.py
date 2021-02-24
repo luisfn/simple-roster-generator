@@ -10,17 +10,38 @@ import sys
 
 
 with open("config/customers.json", "r") as file:
-    customer = sys.argv[2]
-    customers = json.load(file)[customer]
+    try:
+        customer = sys.argv[2]
+        customers = json.load(file)[customer]
+    except IndexError:
+        print('Customer not informed.')
+        exit(1)
+    except KeyError:
+        print(f'Customer {customer} not found on customers config file.')
+        exit(1)
 
 with open("config/headers.json", "r") as file:
-    version = customers['version']
-    headers = json.load(file)[version]
+    try:
+        version = customers['version']
+        headers = json.load(file)[version]
+    except IndexError:
+        print('Version not informed.')
+        exit(1)
+    except KeyError:
+        print(f'Version {version} not found on headers config file.')
+        exit(1)
+
 
 with open("config/mappings.json", "r") as file:
-    customer = sys.argv[2]
-    mappings = json.load(file)[customer]
-
+    try:
+        customer = sys.argv[2]
+        mappings = json.load(file)[customer]
+    except IndexError:
+        print('Customer not informed.')
+        exit(1)
+    except KeyError:
+        print(f'Customer {customer} not found on mappings config file.')
+        exit(1)
 
 def search_files(filter):
     search_path = customers['input']
@@ -63,7 +84,7 @@ def generate_user_files(file_path, writer_aggregated):
         users_per_test = customers['users_per_test']
 
         for row in reader:
-            slug = row['Test Label']
+            slug = map_field(row, 'slug')
 
             for group in groups:
                 path_lqa = f'{output_path}/{group}/LQA'
@@ -124,14 +145,18 @@ def encode_uri(uri):
 
 def get_user(slug, group, index):
     alphabet = string.ascii_letters + string.digits
-    password = ''.join(secrets.choice(alphabet) for i in range(8))
+    password = ''.join(secrets.choice(alphabet) for i in range(customers['password_size']))
     username = f'{slug}_{group}_{index}'
 
-    return [
+    user = [
         username,
-        password,
-        slug
+        password
     ]
+
+    if customers['version'] == "1.x":
+        user.append(slug)
+
+    return user
 
 
 def convert_date(date):
