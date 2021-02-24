@@ -1,0 +1,12 @@
+{
+  "1.x": {
+    "users": ["username","password","slug"],
+    "assignments": [],
+    "line-items": ["uri","label","slug","startTimestamp","endTimestamp","maxAttempts"]
+  },
+  "2.x": {
+    "users": ["username","password"],
+    "assignments": ["username","lineItemSlug"],
+    "line-items": ["uri","label","slug","startTimestamp","endTimestamp","maxAttempts"]
+  }
+}

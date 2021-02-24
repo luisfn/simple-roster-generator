@@ -1,0 +1,16 @@
+{
+  "nsa": {
+    "slug": "Test Label",
+    "label": "Test  Delivery Title (mato mokiniai)",
+    "startTimestamp": "Delivery Start Date &Time",
+    "endTimestamp": "Delivery End Date & Time",
+    "maxAttempts": "Max. Executions"
+  },
+  "invalsi": {
+    "slug": "slug",
+    "label": "label",
+    "startTimestamp": "startTimestamp",
+    "endTimestamp": "endTimestamp",
+    "maxAttempts": ""
+  }
+}

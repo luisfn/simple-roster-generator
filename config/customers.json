@@ -1,0 +1,27 @@
+{
+  "nsa": {
+    "input": "input/nsa",
+    "output": "output/nsa",
+    "aggregated-user-file": "output/nsa/users_aggregated.csv",
+    "aggregated-assignment-file": "output/nsa/assignments_aggregated.csv",
+    "aggregated-line-item-file": "output/nsa/line_items_aggregated.csv",
+    "line-item-filter": ".*labels.*.csv",
+    "user-filter": ".*users|TestTakers.*.csv",
+    "groups": ["OAT", "NSA"],
+    "users_per_test": 100,
+    "version": "1.x",
+    "uri": "https://ltnec.taocloud.org/#MAR21"
+  },
+  "invalsi": {
+    "input": "input/invalsi",
+    "line-item-filter": ".*lineItems-ordinary.*.csv",
+    "user-filter": ".*users*.csv",
+    "aggregated-user-file": "output/invalsi/users_aggregated.csv",
+    "aggregated-assignment-file": "output/invalsi/assignments_aggregated.csv",
+    "aggregated-line-item-file": "output/invalsi/line_items_aggregated.csv",
+    "groups": ["QA", "OAT", "NSA"],
+    "users_per_test": 100,
+    "version": "2.x",
+    "uri": "https://www.invalsi.org#Spring21"
+  }
+}
