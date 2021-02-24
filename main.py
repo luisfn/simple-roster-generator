@@ -244,11 +244,15 @@ def get_slugs_from_file(file_path):
 
 def aggregate_real_users():
     user_files = search_files(customers['user-filter'])
-    aggregated_writer = get_writer('output/nsa/real_users_aggregated.csv')
+    aggregated_writer = get_writer(customers['aggregated-real-user-file'])
     aggregated_writer.writerow(headers['users'])
+
+    print('Files to be processed:', *user_files, sep='\n- ')
 
     for file_path in user_files:
         with open(file_path, newline='') as input_file:
+            print(f'Processing {file_path} ...')
+
             reader = csv.DictReader(input_file)
 
             for row in reader:
