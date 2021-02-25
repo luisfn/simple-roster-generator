@@ -12,7 +12,8 @@
     "users_per_test": 100,
     "password_size": 8,
     "version": "1.x",
-    "uri": "https://ltnec.taocloud.org/#MAR21"
+    "uri": "https://ltnec.taocloud.org/#MAR21",
+    "infrastructure": "ltnec01srp"
   },
   "invalsi": {
     "input": "input/invalsi",
@@ -26,6 +27,7 @@
     "users_per_test": 100,
     "password_size": 8,
     "version": "2.x",
-    "uri": "https://www.invalsi.org#Spring21"
+    "uri": "https://www.invalsi.org#Spring21",
+    "infrastructure": ""
   }
 }

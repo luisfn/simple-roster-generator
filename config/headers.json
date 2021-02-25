@@ -2,7 +2,7 @@
   "1.x": {
     "users": ["username","password","slug"],
     "assignments": [],
-    "line-items": ["uri","label","slug","startTimestamp","endTimestamp","maxAttempts"]
+    "line-items": ["uri","label","slug","startTimestamp","endTimestamp","maxAttempts","infrastructure"]
   },
   "2.x": {
     "users": ["username","password"],

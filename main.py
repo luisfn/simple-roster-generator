@@ -115,7 +115,7 @@ def map_field(row, field):
 
 
 def get_line_item_qa(row):
-    return [
+    line_item = [
         encode_uri(f'{customers["uri"]}-{map_field(row, "slug")}_QA'),
         f'{map_field(row, "label")} (QA)',
         f'{map_field(row, "slug")}_QA',
@@ -124,9 +124,14 @@ def get_line_item_qa(row):
         0
     ]
 
+    if customers["version"] == "1.x":
+        line_item.append(customers["infrastructure"])
+
+    return line_item
+
 
 def get_line_item_lqa(row):
-    return [
+    line_item = [
         encode_uri(f'{customers["uri"]}-{map_field(row, "slug")}'),
         map_field(row, "label"),
         map_field(row, "slug"),
@@ -134,6 +139,11 @@ def get_line_item_lqa(row):
         convert_date(map_field(row, "endTimestamp")),
         1,
     ]
+
+    if customers["version"] == "1.x":
+        line_item.append(customers["infrastructure"])
+
+    return line_item
 
 
 def encode_uri(uri):
@@ -264,6 +274,31 @@ def aggregate_real_users():
                 aggregated_writer.writerow(row.values())
 
 
+def check_repeated_usernames():
+    user_files = search_files(customers['user-filter'])
+
+    seen = {}
+    duplicated_usersnames = []
+
+    for file_path in user_files:
+        with open(file_path, newline='') as input_file:
+            reader = csv.DictReader(input_file)
+
+            for row in reader:
+                values = list(row.values())
+
+                username = values[0]
+                if username not in seen:
+                    seen[username] = 1
+                else:
+                    if seen[username] == 1:
+                        duplicated_usersnames.append(username)
+                    seen[username] += 1
+
+    for duplication in duplicated_usersnames:
+        print(duplication)
+
+
 def sanitize_row(row):
     row = {k: v.strip() for k, v in row.items()}
 
@@ -281,5 +316,7 @@ if __name__ == '__main__':
         check_line_items()
     elif action == 'users:aggregate_real_users':
         aggregate_real_users()
+    elif action == 'users:check_repeated':
+        check_repeated_usernames()
     else:
         print('Invalid operation')
