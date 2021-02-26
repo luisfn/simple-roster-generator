@@ -1,33 +1,42 @@
 {
-  "nsa": {
-    "input": "input/nsa",
-    "output": "output/nsa",
-    "aggregated-user-file": "output/nsa/users_aggregated.csv",
-    "aggregated-real-user-file": "output/nsa/real_users_aggregated.csv",
-    "aggregated-assignment-file": "output/nsa/assignments_aggregated.csv",
-    "aggregated-line-item-file": "output/nsa/line_items_aggregated.csv",
-    "line-item-filter": ".*labels.*.csv",
-    "user-filter": ".*users|TestTakers.*.csv",
-    "groups": ["OAT", "NSA"],
-    "users_per_test": 100,
-    "password_size": 8,
-    "version": "1.x",
-    "uri": "https://ltnec.taocloud.org/#MAR21",
-    "infrastructure": "ltnec01srp"
-  },
-  "invalsi": {
-    "input": "input/invalsi",
-    "line-item-filter": ".*lineItems-ordinary.*.csv",
-    "user-filter": ".*users-ordinary*.csv",
-    "aggregated-user-file": "output/invalsi/users_aggregated.csv",
-    "aggregated-real-user-file": "output/invalsi/real_users_aggregated.csv",
-    "aggregated-assignment-file": "output/invalsi/assignments_aggregated.csv",
-    "aggregated-line-item-file": "output/invalsi/line_items_aggregated.csv",
-    "groups": ["QA", "OAT", "INVALSI"],
-    "users_per_test": 100,
-    "password_size": 8,
-    "version": "2.x",
-    "uri": "https://www.invalsi.org#Spring21",
-    "infrastructure": ""
+  "customers": {
+    "nsa": {
+      "input": "input/nsa",
+      "output": "output/nsa",
+      "aggregated-user-file": "output/nsa/users_aggregated.csv",
+      "aggregated-real-user-file": "output/nsa/real_users_aggregated.csv",
+      "aggregated-assignment-file": "output/nsa/assignments_aggregated.csv",
+      "aggregated-line-item-file": "output/nsa/line_items_aggregated.csv",
+      "line-item-filter": ".*labels.*.csv",
+      "user-filter": ".*users|TestTakers.*.csv",
+      "groups": [
+        "OAT",
+        "NSA"
+      ],
+      "users-per-test": 100,
+      "password-size": 8,
+      "version": "1.x",
+      "uri": "https://ltnec.taocloud.org/#MAR21",
+      "infrastructure": "ltnec01srp"
+    },
+    "invalsi": {
+      "input": "input/invalsi",
+      "line-item-filter": ".*lineItems-ordinary.*.csv",
+      "user-filter": ".*users-ordinary*.csv",
+      "aggregated-user-file": "output/invalsi/users_aggregated.csv",
+      "aggregated-real-user-file": "output/invalsi/real_users_aggregated.csv",
+      "aggregated-assignment-file": "output/invalsi/assignments_aggregated.csv",
+      "aggregated-line-item-file": "output/invalsi/line_items_aggregated.csv",
+      "groups": [
+        "QA",
+        "OAT",
+        "INVALSI"
+      ],
+      "users-per-test": 100,
+      "password-size": 8,
+      "version": "2.x",
+      "uri": "https://www.invalsi.org#Spring21",
+      "infrastructure": ""
+    }
   }
 }

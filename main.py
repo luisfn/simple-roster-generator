@@ -1,5 +1,4 @@
 import csv
-import json
 import secrets
 import string
 from datetime import datetime
@@ -8,43 +7,17 @@ import os
 import re
 import sys
 
+from config import config
 
-with open("config/customers.json", "r") as file:
-    try:
-        customer = sys.argv[2]
-        customers = json.load(file)[customer]
-    except IndexError:
-        print('Customer not informed.')
-        exit(1)
-    except KeyError:
-        print(f'Customer {customer} not found on customers config file.')
-        exit(1)
+customer_name = 'nsa'
+customers = config.get('customers').get(customer_name)
+version = customers.get('version')
+headers = config.get('headers').get(version)
+mappings = config.get('mappings').get(customer_name)
 
-with open("config/headers.json", "r") as file:
-    try:
-        version = customers['version']
-        headers = json.load(file)[version]
-    except IndexError:
-        print('Version not informed.')
-        exit(1)
-    except KeyError:
-        print(f'Version {version} not found on headers config file.')
-        exit(1)
-
-
-with open("config/mappings.json", "r") as file:
-    try:
-        customer = sys.argv[2]
-        mappings = json.load(file)[customer]
-    except IndexError:
-        print('Customer not informed.')
-        exit(1)
-    except KeyError:
-        print(f'Customer {customer} not found on mappings config file.')
-        exit(1)
 
 def search_files(filter):
-    search_path = customers['input']
+    search_path = customers.get('input')
     files_found = []
 
     for dirpath, dirnames, filenames in os.walk(search_path):
@@ -63,8 +36,8 @@ def generate_line_item_files(file_path, writer_aggregated):
         writer_lqa = get_writer(f'{output_path}/line_items_lqa.csv')
         writer_qa = get_writer(f'{output_path}/line_items_qa.csv')
 
-        writer_lqa.writerow(headers['line-items'])
-        writer_qa.writerow(headers['line-items'])
+        writer_lqa.writerow(headers.get('line-items'))
+        writer_qa.writerow(headers.get('line-items'))
 
         for row in reader:
             line_item_lqa = get_line_item_lqa(row)
@@ -80,8 +53,8 @@ def generate_user_files(file_path, writer_aggregated):
         reader = csv.DictReader(input_file)
 
         output_path = prepare_output_path(file_path)
-        groups = customers['groups']
-        users_per_test = customers['users_per_test']
+        groups = customers.get('groups')
+        users_per_test = customers.get('users-per-test')
 
         for row in reader:
             slug = map_field(row, 'slug')
@@ -93,11 +66,11 @@ def generate_user_files(file_path, writer_aggregated):
                 create_directories(path_lqa)
                 create_directories(path_qa)
 
-                writer_live = get_writer(f'{path_lqa}/{slug}-users_per_test.csv')
-                writer_qa = get_writer(f'{path_qa}/{slug}-users_per_test.csv')
+                writer_live = get_writer(f'{path_lqa}/{slug}-users.csv')
+                writer_qa = get_writer(f'{path_qa}/{slug}-users.csv')
 
-                writer_live.writerow(headers['users'])
-                writer_qa.writerow(headers['users'])
+                writer_live.writerow(headers.get('users'))
+                writer_qa.writerow(headers.get('users'))
 
                 for index in range(1, users_per_test + 1):
                     user_live = get_user(slug, group, index)
@@ -109,14 +82,14 @@ def generate_user_files(file_path, writer_aggregated):
 
 
 def map_field(row, field):
-    real_field = mappings[field]
+    real_field = mappings.get(field)
 
     return row[real_field]
 
 
 def get_line_item_qa(row):
     line_item = [
-        encode_uri(f'{customers["uri"]}-{map_field(row, "slug")}_QA'),
+        encode_uri(f'{customers.get("uri")}-{map_field(row, "slug")}_QA'),
         f'{map_field(row, "label")} (QA)',
         f'{map_field(row, "slug")}_QA',
         None,
@@ -124,15 +97,15 @@ def get_line_item_qa(row):
         0
     ]
 
-    if customers["version"] == "1.x":
-        line_item.append(customers["infrastructure"])
+    if version == "1.x":
+        line_item.append(customers.get("infrastructure"))
 
     return line_item
 
 
 def get_line_item_lqa(row):
     line_item = [
-        encode_uri(f'{customers["uri"]}-{map_field(row, "slug")}'),
+        encode_uri(f'{customers.get("uri")}-{map_field(row, "slug")}'),
         map_field(row, "label"),
         map_field(row, "slug"),
         convert_date(map_field(row, "startTimestamp")),
@@ -140,8 +113,8 @@ def get_line_item_lqa(row):
         1,
     ]
 
-    if customers["version"] == "1.x":
-        line_item.append(customers["infrastructure"])
+    if version == "1.x":
+        line_item.append(customers.get("infrastructure"))
 
     return line_item
 
@@ -155,7 +128,7 @@ def encode_uri(uri):
 
 def get_user(slug, group, index):
     alphabet = string.ascii_letters + string.digits
-    password = ''.join(secrets.choice(alphabet) for i in range(customers['password_size']))
+    password = ''.join(secrets.choice(alphabet) for i in range(customers.get('password-size')))
     username = f'{slug}_{group}_{index}'
 
     user = [
@@ -163,7 +136,7 @@ def get_user(slug, group, index):
         password
     ]
 
-    if customers['version'] == "1.x":
+    if version == "1.x":
         user.append(slug)
 
     return user
@@ -206,9 +179,9 @@ def get_writer(file_path):
 
 
 def generate_line_items():
-    line_item_files = search_files(customers['line-item-filter'])
-    aggregated_writer = get_writer(customers["aggregated-line-item-file"])
-    aggregated_writer.writerow(headers['line-items'])
+    line_item_files = search_files(customers.get('line-item-filter'))
+    aggregated_writer = get_writer(customers.get("aggregated-line-item-file"))
+    aggregated_writer.writerow(headers.get('line-items'))
 
     print('Files to be processed:', *line_item_files, sep='\n- ')
 
@@ -217,9 +190,9 @@ def generate_line_items():
 
 
 def generate_users():
-    line_item_files = search_files(customers['line-item-filter'])
-    aggregated_writer = get_writer(customers['aggregated-user-file'])
-    aggregated_writer.writerow(headers['users'])
+    line_item_files = search_files(customers.get('line-item-filter'))
+    aggregated_writer = get_writer(customers.get('aggregated-user-file'))
+    aggregated_writer.writerow(headers.get('users'))
 
     print('Files to be processed:', *line_item_files, sep='\n- ')
 
@@ -228,9 +201,9 @@ def generate_users():
 
 
 def check_line_items():
-    slugs = get_slugs_from_file(customers['aggregated-line-item-file'])
+    slugs = get_slugs_from_file(customers.get('aggregated-line-item-file'))
 
-    with open(customers['aggregated-user-file'], newline='') as input_file:
+    with open(customers.get('aggregated-user-file'), newline='') as input_file:
         reader = csv.DictReader(input_file)
 
         for row in reader:
@@ -253,9 +226,9 @@ def get_slugs_from_file(file_path):
 
 
 def aggregate_real_users():
-    user_files = search_files(customers['user-filter'])
-    aggregated_writer = get_writer(customers['aggregated-real-user-file'])
-    aggregated_writer.writerow(headers['users'])
+    user_files = search_files(customers.get('user-filter'))
+    aggregated_writer = get_writer(customers.get('aggregated-real-user-file'))
+    aggregated_writer.writerow(headers.get('users'))
 
     print('Files to be processed:', *user_files, sep='\n- ')
 
@@ -275,7 +248,7 @@ def aggregate_real_users():
 
 
 def check_repeated_usernames():
-    user_files = search_files(customers['user-filter'])
+    user_files = search_files(customers.get('user-filter'))
 
     seen = {}
     duplicated_usersnames = []
