@@ -39,7 +39,7 @@ customers = [
 actions = [
     {
         'type': 'list',
-        'message': 'Select customer',
+        'message': 'Select action',
         'name': 'action',
         'choices': [
             Separator('=== Line Items ==='),
