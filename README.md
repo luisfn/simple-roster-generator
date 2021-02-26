@@ -5,45 +5,27 @@ This tool aims to simplify the generation of Simple Roster files based on custom
 
 ## Usage
 
-Before running any command, please check/adjust `config/customers.json`
+Before running any command, please check/adjust 
 
-Generate line-items files.
+- [config/customers.json](config/customers.json)
+- [config/headers.json](config/headers.json)
+- [config/mappings.json](config/mappings.json)
 
-```
-/usr/local/bin/python3 ./main.py users:line-items:generate nsa
-```
-
-Generate user files.
+To run the tool, just execute:
 
 ```
-/usr/local/bin/python3 ./main.py users:generate nsa
-```
-
-Checks if all users generated/given have existing slugs.
-
-```
-/usr/local/bin/python3 ./main.py users:check_line_items nsa
-```
-
-Search for real users an aggregate them in a single file.
-
-```
-/usr/local/bin/python3 ./main.py users:aggregate_real_users nsa
+python3 main.py
 ```
 
 ## Dependencies
 
-the only external module been used is `dateutil`. To install it, execute:
+This script was written in python 3.9 and not yet tested on other versions
+
+To install the needed packages, execute
 
 ```
-pip3 install dateutil
+pip3 install dateutil pyinquirer
 ```
-
-## Configuration
-
-- `config/customers.json` - Defines options like input/output parameter per customer.
-- `config/headers.json` - Defines the header for each type of file, based on Simple Roster Version.
-- `config/mapping.json` - Tries to map names used on metadata files from customer to names used on the Simple Roster files.
 
 ## Other tips
 
