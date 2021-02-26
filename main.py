@@ -5,15 +5,9 @@ from datetime import datetime
 from dateutil.parser import parse
 import os
 import re
-import sys
 
+from cli import selector
 from config import config
-
-customer_name = 'nsa'
-customers = config.get('customers').get(customer_name)
-version = customers.get('version')
-headers = config.get('headers').get(version)
-mappings = config.get('mappings').get(customer_name)
 
 
 def search_files(filter):
@@ -178,7 +172,7 @@ def get_writer(file_path):
     return writer
 
 
-def generate_line_items():
+def create_line_items():
     line_item_files = search_files(customers.get('line-item-filter'))
     aggregated_writer = get_writer(customers.get("aggregated-line-item-file"))
     aggregated_writer.writerow(headers.get('line-items'))
@@ -189,7 +183,7 @@ def generate_line_items():
         generate_line_item_files(file, aggregated_writer)
 
 
-def generate_users():
+def create_users():
     line_item_files = search_files(customers.get('line-item-filter'))
     aggregated_writer = get_writer(customers.get('aggregated-user-file'))
     aggregated_writer.writerow(headers.get('users'))
@@ -200,8 +194,9 @@ def generate_users():
         generate_user_files(file, aggregated_writer)
 
 
-def check_line_items():
+def check_user_slugs():
     slugs = get_slugs_from_file(customers.get('aggregated-line-item-file'))
+    errors = 0
 
     with open(customers.get('aggregated-user-file'), newline='') as input_file:
         reader = csv.DictReader(input_file)
@@ -210,7 +205,11 @@ def check_line_items():
             try:
                 slugs.index(row['slug'])
             except ValueError:
+                errors += 1
                 print(f'User {row} have non existing slug')
+
+    if errors == 0:
+        print('No errors found')
 
 
 def get_slugs_from_file(file_path):
@@ -247,7 +246,7 @@ def aggregate_real_users():
                 aggregated_writer.writerow(row.values())
 
 
-def check_repeated_usernames():
+def check_duplicated_usernames():
     user_files = search_files(customers.get('user-filter'))
 
     seen = {}
@@ -279,17 +278,24 @@ def sanitize_row(row):
 
 
 if __name__ == '__main__':
-    action = sys.argv[1]
+    options = selector.options()
+    action = options.get('action')
+    customer = options.get('customer')
 
-    if action == 'line-items:generate':
-        generate_line_items()
-    elif action == 'users:generate':
-        generate_users()
-    elif action == 'users:check_line_items':
-        check_line_items()
-    elif action == 'users:aggregate_real_users':
+    customers = config.get('customers').get(customer)
+    version = customers.get('version')
+    headers = config.get('headers').get(version)
+    mappings = config.get('mappings').get(customer)
+
+    if action == selector.CREATE_LINE_ITEMS:
+        create_line_items()
+    elif action == selector.CREATE_USERS:
+        create_users()
+    elif action == selector.CHECK_USER_SLUGS:
+        check_user_slugs()
+    elif action == selector.AGGREGATE_REAL_USERS:
         aggregate_real_users()
-    elif action == 'users:check_repeated':
-        check_repeated_usernames()
+    elif action == selector.CHECK_DUPLICATED_USERNAMES:
+        check_duplicated_usernames()
     else:
         print('Invalid operation')
