@@ -1,13 +1,17 @@
 import csv
+import os
+import re
 import secrets
 import string
 from datetime import datetime
+
 from dateutil.parser import parse
-import os
-import re
+from rich.console import Console
 
 from cli import selector
 from config import config
+
+console = Console()
 
 
 def search_files(filter):
@@ -23,7 +27,8 @@ def search_files(filter):
 
 def generate_line_item_files(file_path, writer_aggregated):
     with open(file_path, newline='') as input_file:
-        output_path = prepare_output_path(file_path)
+        output_path = get_directory(file_path).replace('input', 'output')
+        create_directories(output_path)
 
         reader = csv.DictReader(input_file)
 
@@ -46,7 +51,9 @@ def generate_user_files(file_path, writer_aggregated):
     with open(file_path, newline='') as input_file:
         reader = csv.DictReader(input_file)
 
-        output_path = prepare_output_path(file_path)
+        output_path = get_directory(file_path).replace('input', 'output')
+        create_directories(output_path)
+
         groups = customers.get('groups')
         users_per_test = customers.get('users-per-test')
 
@@ -60,8 +67,11 @@ def generate_user_files(file_path, writer_aggregated):
                 create_directories(path_lqa)
                 create_directories(path_qa)
 
-                writer_live = get_writer(f'{path_lqa}/{slug}-users.csv')
-                writer_qa = get_writer(f'{path_qa}/{slug}-users.csv')
+                user_file_live = f'{path_lqa}/{slug}-users.csv'
+                user_file_qa = f'{path_qa}/{slug}-users.csv'
+
+                writer_live = get_writer(user_file_live)
+                writer_qa = get_writer(user_file_qa)
 
                 writer_live.writerow(headers.get('users'))
                 writer_qa.writerow(headers.get('users'))
@@ -73,6 +83,9 @@ def generate_user_files(file_path, writer_aggregated):
                     writer_live.writerow(user_live)
                     writer_qa.writerow(user_qa)
                     writer_aggregated.writerows([user_live, user_qa])
+
+                console.print(f'- Generated {user_file_live} - with {users_per_test} users')
+                console.print(f'- Generated {user_file_qa} - with {users_per_test} users')
 
 
 def map_field(row, field):
@@ -143,29 +156,23 @@ def convert_date(date):
     return int(datetime.timestamp(parse(date)))
 
 
-def create_directories(file_path):
+def create_directories(path):
     try:
-        os.makedirs(file_path)
+        os.makedirs(path, exist_ok=True)
     except OSError:
-        print("Creation of the directory %s failed" % file_path)
-    else:
-        print("Successfully created the directory %s " % file_path)
+        console.print("Creation of the directory %s failed" % path)
 
 
-def prepare_output_path(file_path):
-    output_path = os.path.dirname(os.path.realpath(file_path)).replace('input', 'output')
-
-    try:
-        os.makedirs(output_path)
-    except OSError:
-        print("Creation of the directory %s failed" % output_path)
-    else:
-        print("Successfully created the directory %s " % output_path)
+def get_directory(file_path):
+    output_path = os.path.dirname(os.path.realpath(file_path))
 
     return output_path
 
 
 def get_writer(file_path):
+    directory = os.path.dirname(os.path.realpath(file_path))
+    create_directories(directory)
+
     output_file = open(file_path, 'w')
     writer = csv.writer(output_file, delimiter=',', quotechar='"', quoting=csv.QUOTE_MINIMAL)
 
@@ -177,7 +184,7 @@ def create_line_items():
     aggregated_writer = get_writer(customers.get("aggregated-line-item-file"))
     aggregated_writer.writerow(headers.get('line-items'))
 
-    print('Files to be processed:', *line_item_files, sep='\n- ')
+    console.print('Line Items will be generated based on following files:', *line_item_files, sep='\n- ')
 
     for file in line_item_files:
         generate_line_item_files(file, aggregated_writer)
@@ -188,28 +195,30 @@ def create_users():
     aggregated_writer = get_writer(customers.get('aggregated-user-file'))
     aggregated_writer.writerow(headers.get('users'))
 
-    print('Files to be processed:', *line_item_files, sep='\n- ')
+    console.print('Users will be generated based on following files:', *line_item_files, sep='\n- ')
 
     for file in line_item_files:
         generate_user_files(file, aggregated_writer)
 
 
-def check_user_slugs():
-    slugs = get_slugs_from_file(customers.get('aggregated-line-item-file'))
-    errors = 0
+def check_user_slugs(user_type):
+    file_path = user_file_path(user_type)
 
-    with open(customers.get('aggregated-user-file'), newline='') as input_file:
+    slugs = get_slugs_from_file(customers.get('aggregated-line-item-file'))
+    errors = False
+
+    with open(file_path, newline='') as input_file:
         reader = csv.DictReader(input_file)
 
         for row in reader:
             try:
                 slugs.index(row['slug'])
             except ValueError:
-                errors += 1
-                print(f'User {row} have non existing slug')
+                errors = True
+                console.print(f'User {row} have non existing slug')
 
-    if errors == 0:
-        print('No errors found')
+    if not errors:
+        console.print('No errors found', style="bold red")
 
 
 def get_slugs_from_file(file_path):
@@ -229,15 +238,16 @@ def aggregate_real_users():
     aggregated_writer = get_writer(customers.get('aggregated-real-user-file'))
     aggregated_writer.writerow(headers.get('users'))
 
-    print('Files to be processed:', *user_files, sep='\n- ')
+    console.print('Real users will be generated based on following files:', *user_files, sep='\n- ')
 
     for file_path in user_files:
-        with open(file_path, newline='') as input_file:
-            print(f'Processing {file_path} ...')
+        total_users = 0
 
+        with open(file_path, newline='') as input_file:
             reader = csv.DictReader(input_file)
 
             for row in reader:
+                total_users += 1
                 if 'groupid' in row:
                     row.pop('groupid')
 
@@ -245,30 +255,46 @@ def aggregate_real_users():
 
                 aggregated_writer.writerow(row.values())
 
+            console.print(f'- Processed {file_path} - {total_users} users generated')
 
-def check_duplicated_usernames():
-    user_files = search_files(customers.get('user-filter'))
+
+def check_duplicated_usernames(user_type):
+    file_path = user_file_path(user_type)
 
     seen = {}
-    duplicated_usersnames = []
+    duplicated_usernames = []
 
-    for file_path in user_files:
-        with open(file_path, newline='') as input_file:
-            reader = csv.DictReader(input_file)
+    with open(file_path, newline='') as input_file:
+        reader = csv.DictReader(input_file)
 
-            for row in reader:
-                values = list(row.values())
+        for row in reader:
+            values = list(row.values())
 
-                username = values[0]
-                if username not in seen:
-                    seen[username] = 1
-                else:
-                    if seen[username] == 1:
-                        duplicated_usersnames.append(username)
-                    seen[username] += 1
+            username = values[0]
+            if username not in seen:
+                seen[username] = 1
+            else:
+                if seen[username] == 1:
+                    duplicated_usernames.append(username)
+                seen[username] += 1
 
-    for duplication in duplicated_usersnames:
-        print(duplication)
+    if duplicated_usernames:
+        for duplication in duplicated_usernames:
+            console.print(duplication)
+    else:
+        console.print('No duplications were found.')
+
+
+def user_file_path(user_type):
+    if user_type == selector.USER_TYPE_REAL:
+        file_path = customers.get('aggregated-real-user-file')
+    elif user_type == selector.USER_TYPE_LQA_QA:
+        file_path = customers.get('aggregated-user-file')
+    else:
+        console.print(f'Invalid User type: {user_type}')
+        exit(1)
+
+    return file_path
 
 
 def sanitize_row(row):
@@ -278,9 +304,8 @@ def sanitize_row(row):
 
 
 if __name__ == '__main__':
-    options = selector.options()
-    action = options.get('action')
-    customer = options.get('customer')
+    customer = selector.customers()
+    action = selector.actions()
 
     customers = config.get('customers').get(customer)
     version = customers.get('version')
@@ -292,10 +317,12 @@ if __name__ == '__main__':
     elif action == selector.CREATE_USERS:
         create_users()
     elif action == selector.CHECK_USER_SLUGS:
-        check_user_slugs()
+        user_type = selector.user_types()
+        check_user_slugs(user_type)
     elif action == selector.AGGREGATE_REAL_USERS:
         aggregate_real_users()
     elif action == selector.CHECK_DUPLICATED_USERNAMES:
-        check_duplicated_usernames()
+        user_type = selector.user_types()
+        check_duplicated_usernames(user_type)
     else:
-        print('Invalid operation')
+        console.print('Invalid operation')
