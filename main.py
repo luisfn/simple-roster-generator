@@ -330,15 +330,18 @@ def check_duplicated_usernames(user_type):
 
 
 def user_file_path(user_type):
-    if user_type == selector.USER_TYPE_REAL:
-        file_path = customers.get('aggregated-real-user-file')
-    elif user_type == selector.USER_TYPE_LQA_QA:
-        file_path = customers.get('aggregated-user-file')
-    else:
-        console.print(f'Invalid User type: {user_type}')
-        exit(1)
+    paths = {
+        "1.x": {
+            selector.USER_TYPE_REAL: customers.get('aggregated-real-user-file'),
+            selector.USER_TYPE_LQA_QA: customers.get('aggregated-user-file')
+        },
+        "2.x": {
+            selector.USER_TYPE_REAL: customers.get('aggregated-real-assignment-file'),
+            selector.USER_TYPE_LQA_QA: customers.get('aggregated-assignment-file')
+        }
+    }
 
-    return file_path
+    return paths.get(version).get(user_type)
 
 
 def sanitize_row(row):
