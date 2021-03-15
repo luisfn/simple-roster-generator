@@ -225,7 +225,8 @@ def check_user_slugs(user_type):
 
         for row in reader:
             try:
-                slugs.index(row['slug'])
+                slug = row['slug'] if version == '1.x' else row['lineItemSlug']
+                slugs.index(slug)
             except ValueError:
                 errors = True
                 console.print(f'User {row} have non existing slug')
