@@ -4,9 +4,10 @@
       "input": "input/nsa",
       "output": "output/nsa",
       "aggregated-user-file": "output/nsa/users_aggregated.csv",
-      "aggregated-real-user-file": "output/nsa/real_users_aggregated.csv",
       "aggregated-assignment-file": "output/nsa/assignments_aggregated.csv",
       "aggregated-line-item-file": "output/nsa/line_items_aggregated.csv",
+      "aggregated-real-user-file": "output/nsa/real_users_aggregated.csv",
+      "aggregated-real-assignment-file": "output/nsa/real_assignments_aggregated.csv",
       "line-item-filter": ".*labels.*.csv",
       "user-filter": ".*users|TestTakers.*.csv",
       "groups": [
@@ -25,9 +26,10 @@
       "line-item-filter": ".*lineItems-ordinary.*.csv",
       "user-filter": ".*users-ordinary*.csv",
       "aggregated-user-file": "output/invalsi/users_aggregated.csv",
-      "aggregated-real-user-file": "output/invalsi/real_users_aggregated.csv",
       "aggregated-assignment-file": "output/invalsi/assignments_aggregated.csv",
       "aggregated-line-item-file": "output/invalsi/line_items_aggregated.csv",
+      "aggregated-real-user-file": "output/invalsi/real_users_aggregated.csv",
+      "aggregated-real-assignment-file": "output/invalsi/real_assignments_aggregated.csv",
       "groups": [
         "QA",
         "OAT",

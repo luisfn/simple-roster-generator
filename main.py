@@ -106,9 +106,9 @@ def map_field(row, path):
 
 def get_line_item_qa(row):
     line_item = [
-        encode_uri(f'{customers.get("uri")}-{map_field(row, "line-items.slug")}_QA'),
+        encode_uri(f'{customers.get("uri")}-{map_field(row, "line-items.slug")}-QA'),
         f'{map_field(row, "line-items.label")} (QA)',
-        f'{map_field(row, "line-items.slug")}_QA',
+        f'{map_field(row, "line-items.slug")}-QA',
         None,
         None,
         0
@@ -248,8 +248,11 @@ def get_slugs_from_file(file_path):
 
 def aggregate_real_users():
     user_files = search_files(customers.get('user-filter'))
-    aggregated_writer = get_writer(customers.get('aggregated-real-user-file'))
+    aggregated_user_writer = get_writer(customers.get('aggregated-real-user-file'))
+    aggregated_assignment_writer = get_writer(customers.get('aggregated-real-assignment-file'))
+
     user_headers = headers.get('users')
+    assignment_headers = headers.get('assignments')
 
     use_group_id = customers.get('use_group_id')
     default_group = customers.get('default_group_id')
@@ -257,7 +260,8 @@ def aggregate_real_users():
     if not use_group_id:
         user_headers.remove('groupId')
 
-    aggregated_writer.writerow(user_headers)
+    aggregated_user_writer.writerow(user_headers)
+    aggregated_assignment_writer.writerow(assignment_headers)
 
     console.print('Real users will be generated based on following files:', *user_files, sep='\n- ')
 
@@ -269,22 +273,31 @@ def aggregate_real_users():
 
             for row in reader:
                 row = sanitize_row(row)
+                slug = map_field(row, 'users.slug')
 
                 total_users += 1
 
                 # TODO fix this workaround for BOM characters
                 username = map_field(row, 'users.username') or row.get('\ufeffusername')
 
-                data = [
+                user_data = [
                     username,
                     map_field(row, 'users.password'),
-                    map_field(row, 'users.slug'),
                 ]
 
-                if use_group_id:
-                    data.append(map_field(row, 'users.groupId') or default_group)
+                if version == '1.x':
+                    user_data.append(slug)
 
-                aggregated_writer.writerow(data)
+                if use_group_id:
+                    user_data.append(map_field(row, 'users.groupId') or default_group)
+
+                aggregated_user_writer.writerow(user_data)
+
+                if version == '2.x':
+                    aggregated_assignment_writer.writerow([
+                        username,
+                        slug
+                    ])
 
             console.print(f'- Processed {file_path} - {total_users} users generated')
 

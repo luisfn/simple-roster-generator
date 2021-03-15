@@ -41,3 +41,10 @@ brew install gnumeric
 
 ssconvert -S file.xlsx file.csv
 ```
+
+Remove Lines of a file, containing certain string
+```
+brew install gsed
+
+gsed -i '/M21_08LIN_TED_TA2/d' ./aggregated-assignments.csv
+```

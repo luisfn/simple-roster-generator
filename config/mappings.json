@@ -30,6 +30,7 @@
       "users": {
         "username": "username",
         "password": "password",
+        "slug": "forma",
         "groupId": "group_id"
       }
     }
