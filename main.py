@@ -58,7 +58,7 @@ def generate_user_files(file_path, writer_aggregated):
         users_per_test = customers.get('users-per-test')
 
         for row in reader:
-            slug = map_field(row, 'slug')
+            slug = map_field(row, 'line-items.slug')
 
             for group in groups:
                 path_lqa = f'{output_path}/{group}/LQA'
@@ -76,29 +76,39 @@ def generate_user_files(file_path, writer_aggregated):
                 writer_live.writerow(headers.get('users'))
                 writer_qa.writerow(headers.get('users'))
 
+                group_index = 1
+
                 for index in range(1, users_per_test + 1):
-                    user_live = get_user(slug, group, index)
-                    user_qa = get_user(f'{slug}_QA', group, index)
+                    user_live = get_user(slug, group, index, group_index)
+                    user_qa = get_user(f'{slug}_QA', group, index, group_index)
 
                     writer_live.writerow(user_live)
                     writer_qa.writerow(user_qa)
                     writer_aggregated.writerows([user_live, user_qa])
 
+                    # TODO make it dynamic, based on the users x groups
+                    if index % 20 == 0:
+                        group_index += 1
+
                 console.print(f'- Generated {user_file_live} - with {users_per_test} users')
                 console.print(f'- Generated {user_file_qa} - with {users_per_test} users')
 
 
-def map_field(row, field):
-    real_field = mappings.get(field)
+def map_field(row, path):
+    field = mappings
+    keys = path.split('.')
 
-    return row[real_field]
+    for key in keys:
+        field = field.get(key)
+
+    return row.get(field)
 
 
 def get_line_item_qa(row):
     line_item = [
-        encode_uri(f'{customers.get("uri")}-{map_field(row, "slug")}_QA'),
-        f'{map_field(row, "label")} (QA)',
-        f'{map_field(row, "slug")}_QA',
+        encode_uri(f'{customers.get("uri")}-{map_field(row, "line-items.slug")}_QA'),
+        f'{map_field(row, "line-items.label")} (QA)',
+        f'{map_field(row, "line-items.slug")}_QA',
         None,
         None,
         0
@@ -112,11 +122,11 @@ def get_line_item_qa(row):
 
 def get_line_item_lqa(row):
     line_item = [
-        encode_uri(f'{customers.get("uri")}-{map_field(row, "slug")}'),
-        map_field(row, "label"),
-        map_field(row, "slug"),
-        convert_date(map_field(row, "startTimestamp")),
-        convert_date(map_field(row, "endTimestamp")),
+        encode_uri(f'{customers.get("uri")}-{map_field(row, "line-items.slug")}'),
+        map_field(row, "line-items.label"),
+        map_field(row, "line-items.slug"),
+        convert_date(map_field(row, "line-items.startTimestamp")),
+        convert_date(map_field(row, "line-items.endTimestamp")),
         1,
     ]
 
@@ -133,10 +143,11 @@ def encode_uri(uri):
     return uri
 
 
-def get_user(slug, group, index):
+def get_user(slug, group, index, group_index):
     alphabet = string.ascii_letters + string.digits
     password = ''.join(secrets.choice(alphabet) for i in range(customers.get('password-size')))
     username = f'{slug}_{group}_{index}'
+    group_id = f'{slug}_{str(group_index).zfill(4)}'
 
     user = [
         username,
@@ -145,6 +156,8 @@ def get_user(slug, group, index):
 
     if version == "1.x":
         user.append(slug)
+
+    user.append(group_id)
 
     return user
 
@@ -236,7 +249,15 @@ def get_slugs_from_file(file_path):
 def aggregate_real_users():
     user_files = search_files(customers.get('user-filter'))
     aggregated_writer = get_writer(customers.get('aggregated-real-user-file'))
-    aggregated_writer.writerow(headers.get('users'))
+    user_headers = headers.get('users')
+
+    use_group_id = customers.get('use_group_id')
+    default_group = customers.get('default_group_id')
+
+    if not use_group_id:
+        user_headers.remove('groupId')
+
+    aggregated_writer.writerow(user_headers)
 
     console.print('Real users will be generated based on following files:', *user_files, sep='\n- ')
 
@@ -247,13 +268,23 @@ def aggregate_real_users():
             reader = csv.DictReader(input_file)
 
             for row in reader:
-                total_users += 1
-                if 'groupid' in row:
-                    row.pop('groupid')
-
                 row = sanitize_row(row)
 
-                aggregated_writer.writerow(row.values())
+                total_users += 1
+
+                # TODO fix this workaround for BOM characters
+                username = map_field(row, 'users.username') or row.get('\ufeffusername')
+
+                data = [
+                    username,
+                    map_field(row, 'users.password'),
+                    map_field(row, 'users.slug'),
+                ]
+
+                if use_group_id:
+                    data.append(map_field(row, 'users.groupId') or default_group)
+
+                aggregated_writer.writerow(data)
 
             console.print(f'- Processed {file_path} - {total_users} users generated')
 

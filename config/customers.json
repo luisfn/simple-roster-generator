@@ -10,14 +10,15 @@
       "line-item-filter": ".*labels.*.csv",
       "user-filter": ".*users|TestTakers.*.csv",
       "groups": [
-        "OAT",
-        "NSA"
+        "OAT","NSA"
       ],
       "users-per-test": 100,
       "password-size": 8,
       "version": "1.x",
       "uri": "https://ltnec.taocloud.org/#MAR21",
-      "infrastructure": "ltnec01srp"
+      "infrastructure": "ltnec01srp",
+      "use_group_id": true,
+      "default_group_id": "oat-default-group"
     },
     "invalsi": {
       "input": "input/invalsi",
@@ -36,7 +37,9 @@
       "password-size": 8,
       "version": "2.x",
       "uri": "https://www.invalsi.org#Spring21",
-      "infrastructure": ""
+      "infrastructure": "",
+      "use_group_id": false,
+      "default_group_id": null
     }
   }
 }

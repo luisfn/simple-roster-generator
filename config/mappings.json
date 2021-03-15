@@ -1,18 +1,37 @@
 {
   "mappings": {
     "nsa": {
-      "slug": "Test Label",
-      "label": "Test  Delivery Title (mato mokiniai)",
-      "startTimestamp": "Delivery Start Date &Time",
-      "endTimestamp": "Delivery End Date & Time",
-      "maxAttempts": "Max. Executions"
+      "line-items": {
+        "slug": "Test Label",
+        "label": "Test  Delivery Title (mato mokiniai)",
+        "startTimestamp": "Delivery Start Date &Time",
+        "endTimestamp": "Delivery End Date & Time",
+        "maxAttempts": "Max. Executions"
+      },
+      "users": {
+        "username": "username",
+        "password": "password",
+        "slug": "slug",
+        "groupId": "group_id"
+      }
     },
     "invalsi": {
-      "slug": "slug",
-      "label": "label",
-      "startTimestamp": "startTimestamp",
-      "endTimestamp": "endTimestamp",
-      "maxAttempts": ""
+      "line-items": {
+        "slug": "slug",
+        "label": "label",
+        "startTimestamp": "startTimestamp",
+        "endTimestamp": "endTimestamp",
+        "maxAttempts": null
+      },
+      "assignments": {
+        "username": "username",
+        "slug": "slug"
+      },
+      "users": {
+        "username": "username",
+        "password": "password",
+        "groupId": "group_id"
+      }
     }
   }
 }

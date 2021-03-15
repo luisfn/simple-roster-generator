@@ -4,7 +4,8 @@
       "users": [
         "username",
         "password",
-        "slug"
+        "slug",
+        "groupId"
       ],
       "assignments": [],
       "line-items": [
@@ -20,7 +21,8 @@
     "2.x": {
       "users": [
         "username",
-        "password"
+        "password",
+        "groupId"
       ],
       "assignments": [
         "username",
