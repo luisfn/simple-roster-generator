@@ -33,6 +33,25 @@
         "slug": "forma",
         "groupId": "group_id"
       }
+    },
+    "depp": {
+      "line-items": {
+        "slug": "Slug",
+        "label": "Label",
+        "startTimestamp": "Start Date",
+        "endTimestamp": "End Date",
+        "maxAttempts": "Max attempts"
+      },
+      "assignments": {
+        "username": "username",
+        "slug": "slug"
+      },
+      "users": {
+        "username": "username",
+        "password": "password",
+        "slug": "slug",
+        "groupId": "groupId"
+      }
     }
   }
 }

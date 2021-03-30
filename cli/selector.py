@@ -37,6 +37,10 @@ def customers():
                     'name': 'NSA',
                     'value': 'nsa'
                 },
+                {
+                    'name': 'DEPP',
+                    'value': 'depp'
+                },
             ],
         }
     ]

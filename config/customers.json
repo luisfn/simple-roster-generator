@@ -42,6 +42,28 @@
       "infrastructure": "",
       "use_group_id": false,
       "default_group_id": null
+    },
+    "depp": {
+      "input": "input/depp",
+      "line-item-filter": ".*lineItems.csv",
+      "user-filter": ".*users.csv",
+      "aggregated-user-file": "output/depp/users_aggregated.csv",
+      "aggregated-assignment-file": "output/depp/assignments_aggregated.csv",
+      "aggregated-line-item-file": "output/depp/line_items_aggregated.csv",
+      "aggregated-real-user-file": "output/depp/real_users_aggregated.csv",
+      "aggregated-real-assignment-file": "output/depp/real_assignments_aggregated.csv",
+      "groups": [
+        "QA",
+        "OAT",
+        "DEPP"
+      ],
+      "users-per-test": 50,
+      "password-size": 8,
+      "version": "2.x",
+      "uri": "",
+      "infrastructure": "",
+      "use_group_id": false,
+      "default_group_id": null
     }
   }
 }
