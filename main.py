@@ -47,7 +47,7 @@ def generate_line_item_files(file_path, writer_aggregated):
             writer_aggregated.writerows([line_item_lqa, line_item_qa])
 
 
-def generate_user_files(file_path, writer_aggregated):
+def generate_user_files(file_path, aggregated_user_writer, aggregated_assignment_writer):
     with open(file_path, newline='') as input_file:
         reader = csv.DictReader(input_file)
 
@@ -84,7 +84,18 @@ def generate_user_files(file_path, writer_aggregated):
 
                     writer_live.writerow(user_live)
                     writer_qa.writerow(user_qa)
-                    writer_aggregated.writerows([user_live, user_qa])
+                    aggregated_user_writer.writerows([user_live, user_qa])
+
+                    if version == '2.x':
+                        aggregated_assignment_writer.writerow([
+                            f'{slug}_{group}_{index}',
+                            slug
+                        ])
+
+                        aggregated_assignment_writer.writerow([
+                            f'{slug}_QA_{group}_{index}',
+                            f'{slug}_QA'
+                        ])
 
                     # TODO make it dynamic, based on the users x groups
                     if index % 20 == 0:
@@ -105,10 +116,15 @@ def map_field(row, path):
 
 
 def get_line_item_qa(row):
+    if not customers.get("uri"):
+        uri = map_field(row, "line-items.slug")
+    else:
+        uri = encode_uri(f'{customers.get("uri")}{map_field(row, "line-items.slug")}_QA')
+
     line_item = [
-        encode_uri(f'{customers.get("uri")}-{map_field(row, "line-items.slug")}-QA'),
-        f'{map_field(row, "line-items.label")} (QA)',
-        f'{map_field(row, "line-items.slug")}-QA',
+        uri,
+        f'{map_field(row, "line-items.label")}_QA',
+        f'{map_field(row, "line-items.slug")}_QA',
         None,
         None,
         0
@@ -121,13 +137,18 @@ def get_line_item_qa(row):
 
 
 def get_line_item_lqa(row):
+    if not customers.get("uri"):
+        uri = map_field(row, "line-items.slug")
+    else:
+        uri = encode_uri(f'{customers.get("uri")}{map_field(row, "line-items.slug")}')
+
     line_item = [
-        encode_uri(f'{customers.get("uri")}-{map_field(row, "line-items.slug")}'),
+        uri,
         map_field(row, "line-items.label"),
         map_field(row, "line-items.slug"),
         convert_date(map_field(row, "line-items.startTimestamp")),
         convert_date(map_field(row, "line-items.endTimestamp")),
-        1,
+        convert_date(map_field(row, "line-items.maxAttempts")),
     ]
 
     if version == "1.x":
@@ -139,6 +160,7 @@ def get_line_item_lqa(row):
 def encode_uri(uri):
     uri = re.sub("_(\d)_", r"-\1-", uri)
     uri = re.sub("-(\d)_", r"-\1-", uri)
+    uri = re.sub("_(\d)-", r"-\1-", uri)
 
     return uri
 
@@ -147,7 +169,6 @@ def get_user(slug, group, index, group_index):
     alphabet = string.ascii_letters + string.digits
     password = ''.join(secrets.choice(alphabet) for i in range(customers.get('password-size')))
     username = f'{slug}_{group}_{index}'
-    group_id = f'{slug}_{str(group_index).zfill(4)}'
 
     user = [
         username,
@@ -157,7 +178,9 @@ def get_user(slug, group, index, group_index):
     if version == "1.x":
         user.append(slug)
 
-    user.append(group_id)
+    if customers.get('use_group_id'):
+        group_id = f'{slug}_{str(group_index).zfill(4)}'
+        user.append(group_id)
 
     return user
 
@@ -205,13 +228,17 @@ def create_line_items():
 
 def create_users():
     line_item_files = search_files(customers.get('line-item-filter'))
-    aggregated_writer = get_writer(customers.get('aggregated-user-file'))
-    aggregated_writer.writerow(headers.get('users'))
+
+    aggregated_user_writer = get_writer(customers.get('aggregated-user-file'))
+    aggregated_assignment_writer = get_writer(customers.get('aggregated-assignment-file'))
+
+    aggregated_user_writer.writerow(headers.get('users'))
+    aggregated_assignment_writer.writerow(headers.get('assignments'))
 
     console.print('Users will be generated based on following files:', *line_item_files, sep='\n- ')
 
     for file in line_item_files:
-        generate_user_files(file, aggregated_writer)
+        generate_user_files(file, aggregated_user_writer, aggregated_assignment_writer)
 
 
 def check_user_slugs(user_type):
