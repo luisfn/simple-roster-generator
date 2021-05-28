@@ -56,7 +56,7 @@ def generate_user_files(file_path, aggregated_user_writer, aggregated_assignment
     with open(file_path, newline='') as input_file:
         reader = csv.DictReader(input_file)
 
-        output_path = get_directory(file_path).replace('input', 'output')
+        output_path = customers.get('split-users-directory')
         create_directories(output_path)
 
         groups = customers.get('groups')

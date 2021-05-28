@@ -3,6 +3,7 @@
     "nsa": {
       "input": "input/nsa/2021April",
       "output": "output/nsa/2021April",
+      "split-users-directory": "output/nsa/2021April/split_users",
       "aggregated-user-file": "output/nsa/2021April/users_aggregated.csv",
       "aggregated-assignment-file": "output/nsa/2021April/assignments_aggregated.csv",
       "aggregated-line-item-file": "output/nsa/2021April/line_items_aggregated.csv",
@@ -26,6 +27,7 @@
       "input": "input/invalsi",
       "line-item-filter": ".*lineItems-ordinary.*.csv",
       "user-filter": ".*users-ordinary*.csv",
+      "split-users-directory": "output/invalsi/split_users",
       "aggregated-user-file": "output/invalsi/users_aggregated.csv",
       "aggregated-assignment-file": "output/invalsi/assignments_aggregated.csv",
       "aggregated-line-item-file": "output/invalsi/line_items_aggregated.csv",
@@ -49,6 +51,7 @@
       "input": "input/depp/2021_september",
       "line-item-filter": ".*lineItems.csv",
       "user-filter": ".*users.csv",
+      "split-users-directory": "output/depp/2021_september/preprod/split_users",
       "aggregated-user-file": "output/depp/2021_september/preprod/users_aggregated.csv",
       "aggregated-assignment-file": "output/depp/2021_september/preprod/assignments_aggregated.csv",
       "aggregated-line-item-file": "output/depp/2021_september/preprod/line_items_aggregated.csv",
