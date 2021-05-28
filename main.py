@@ -35,8 +35,13 @@ def generate_line_item_files(file_path, writer_aggregated):
         writer_lqa = get_writer(f'{output_path}/line_items_lqa.csv')
         writer_qa = get_writer(f'{output_path}/line_items_qa.csv')
 
-        writer_lqa.writerow(headers.get('line-items'))
-        writer_qa.writerow(headers.get('line-items'))
+        line_item_headers = headers.get('line-items')
+
+        if not customers.get('line-item-group-id-enabled'):
+            line_item_headers.remove('groupId')
+
+        writer_lqa.writerow(line_item_headers)
+        writer_qa.writerow(line_item_headers)
 
         for row in reader:
             line_item_lqa = get_line_item_lqa(row)
@@ -133,6 +138,10 @@ def get_line_item_qa(row):
     if version == "1.x":
         line_item.append(customers.get("infrastructure"))
 
+    if customers.get('line-item-group-id-enabled'):
+        group_id = f'{map_field(row, "line-items.groupId")}_QA'
+        line_item.append(group_id)
+
     return line_item
 
 
@@ -153,6 +162,10 @@ def get_line_item_lqa(row):
 
     if version == "1.x":
         line_item.append(customers.get("infrastructure"))
+
+    if customers.get('line-item-group-id-enabled'):
+        group_id = f'{map_field(row, "line-items.groupId")}'
+        line_item.append(group_id)
 
     return line_item
 
@@ -178,7 +191,7 @@ def get_user(slug, group, index, group_index):
     if version == "1.x":
         user.append(slug)
 
-    if customers.get('use_group_id'):
+    if customers.get('user-group-id-enabled'):
         group_id = f'{slug}_{str(group_index).zfill(4)}'
         user.append(group_id)
 
@@ -186,6 +199,9 @@ def get_user(slug, group, index, group_index):
 
 
 def convert_date(date):
+    if date == "":
+        return None
+
     if str(date).isnumeric():
         return date
 
@@ -282,10 +298,10 @@ def aggregate_real_users():
     user_headers = headers.get('users')
     assignment_headers = headers.get('assignments')
 
-    use_group_id = customers.get('use_group_id')
-    default_group = customers.get('default_group_id')
+    user_group_id_enabled = customers.get('user-group-id-enabled')
+    default_user_group_id = customers.get('default-user-group-id')
 
-    if not use_group_id:
+    if not user_group_id_enabled:
         user_headers.remove('groupId')
 
     aggregated_user_writer.writerow(user_headers)
@@ -316,8 +332,8 @@ def aggregate_real_users():
                 if version == '1.x':
                     user_data.append(slug)
 
-                if use_group_id:
-                    user_data.append(map_field(row, 'users.groupId') or default_group)
+                if user_group_id_enabled:
+                    user_data.append(map_field(row, 'users.groupId') or default_user_group_id)
 
                 aggregated_user_writer.writerow(user_data)
 

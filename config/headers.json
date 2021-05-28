@@ -34,7 +34,8 @@
         "slug",
         "startTimestamp",
         "endTimestamp",
-        "maxAttempts"
+        "maxAttempts",
+        "groupId"
       ]
     }
   }

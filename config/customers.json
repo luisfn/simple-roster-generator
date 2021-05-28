@@ -1,13 +1,13 @@
 {
   "customers": {
     "nsa": {
-      "input": "input/nsa",
-      "output": "output/nsa",
-      "aggregated-user-file": "output/nsa/users_aggregated.csv",
-      "aggregated-assignment-file": "output/nsa/assignments_aggregated.csv",
-      "aggregated-line-item-file": "output/nsa/line_items_aggregated.csv",
-      "aggregated-real-user-file": "output/nsa/real_users_aggregated.csv",
-      "aggregated-real-assignment-file": "output/nsa/real_assignments_aggregated.csv",
+      "input": "input/nsa/2021April",
+      "output": "output/nsa/2021April",
+      "aggregated-user-file": "output/nsa/2021April/users_aggregated.csv",
+      "aggregated-assignment-file": "output/nsa/2021April/assignments_aggregated.csv",
+      "aggregated-line-item-file": "output/nsa/2021April/line_items_aggregated.csv",
+      "aggregated-real-user-file": "output/nsa/2021April/real_users_aggregated.csv",
+      "aggregated-real-assignment-file": "output/nsa/2021April/real_assignments_aggregated.csv",
       "line-item-filter": ".*labels.*.csv",
       "user-filter": ".*users|TestTakers.*.csv",
       "groups": [
@@ -16,10 +16,11 @@
       "users-per-test": 100,
       "password-size": 8,
       "version": "1.x",
-      "uri": "https://ltnec.taocloud.org/#MAR21",
+      "uri": "https://ltnec.taocloud.org/#",
       "infrastructure": "ltnec01srp",
-      "use_group_id": true,
-      "default_group_id": "oat-default-group"
+      "user-group-id-enabled": false,
+      "line-item-group-id-enabled": false,
+      "default-user-group-id": "oat-default-group"
     },
     "invalsi": {
       "input": "input/invalsi",
@@ -40,30 +41,32 @@
       "version": "2.x",
       "uri": "https://www.invalsi.org#Spring21",
       "infrastructure": "",
-      "use_group_id": false,
-      "default_group_id": null
+      "user-group-id-enabled": false,
+      "line-item-group-id-enabled": false,
+      "default-user-group-id": null
     },
     "depp": {
-      "input": "input/depp",
+      "input": "input/depp/2021_september",
       "line-item-filter": ".*lineItems.csv",
       "user-filter": ".*users.csv",
-      "aggregated-user-file": "output/depp/users_aggregated.csv",
-      "aggregated-assignment-file": "output/depp/assignments_aggregated.csv",
-      "aggregated-line-item-file": "output/depp/line_items_aggregated.csv",
-      "aggregated-real-user-file": "output/depp/real_users_aggregated.csv",
-      "aggregated-real-assignment-file": "output/depp/real_assignments_aggregated.csv",
+      "aggregated-user-file": "output/depp/2021_september/preprod/users_aggregated.csv",
+      "aggregated-assignment-file": "output/depp/2021_september/preprod/assignments_aggregated.csv",
+      "aggregated-line-item-file": "output/depp/2021_september/preprod/line_items_aggregated.csv",
+      "aggregated-real-user-file": "output/depp/2021_september/preprod/real_users_aggregated.csv",
+      "aggregated-real-assignment-file": "output/depp/2021_september/preprod/real_assignments_aggregated.csv",
       "groups": [
         "QA",
         "OAT",
         "DEPP"
       ],
-      "users-per-test": 50,
+      "users-per-test": 100,
       "password-size": 8,
       "version": "2.x",
-      "uri": "",
+      "uri": "https://depp.fr#September21-Delivery_",
       "infrastructure": "",
-      "use_group_id": false,
-      "default_group_id": null
+      "user-group-id-enabled": false,
+      "line-item-group-id-enabled": true,
+      "default-user-group-id": null
     }
   }
 }
