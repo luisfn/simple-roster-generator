@@ -192,8 +192,11 @@ def get_user(slug, group, index, group_index):
         user.append(slug)
 
     if customers.get('user-group-id-enabled'):
-        group_id = f'{slug}_{str(group_index).zfill(4)}'
-        user.append(group_id)
+        if customers.get('default-user-group-id'):
+            user.append(customers.get('default-user-group-id'))
+        else:
+            group_id = f'{slug}_{str(group_index).zfill(4)}'
+            user.append(group_id)
 
     return user
 
