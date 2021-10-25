@@ -31,14 +31,14 @@ Join contents of multiple csv files
 awk 'FNR==1 && NR!=1{next;}{print}' file1.csv file2.csv > file3.csv
 ```
 
-Convert Excel file to csv (-S for all tabs)
+Convert Excel file to csv (-S for all tabs) - For OSX
 ```
 brew install gnumeric
 
 ssconvert -S file.xlsx file.csv
 ```
 
-Remove Lines of a file, containing certain string
+Remove Lines of a file, containing certain string - For OSX
 ```
 brew install gsed
 

@@ -1,5 +1,10 @@
-.idea/
-input/
-output/
+.idea
+.DS_Store
+input/*
+!input/.gitkeep
+output/*
+!output/.gitkeep
 */__pycache__/
 *.pyc
+lib/
+bin/
