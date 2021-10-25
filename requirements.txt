@@ -1,0 +1,12 @@
+colorama==0.4.4
+commonmark==0.9.1
+console==0.9907
+ezenv==0.92
+prompt-toolkit==1.0.14
+Pygments==2.10.0
+PyInquirer==1.0.3
+python-dateutil==2.8.2
+regex==2021.10.23
+rich==10.12.0
+six==1.16.0
+wcwidth==0.2.5

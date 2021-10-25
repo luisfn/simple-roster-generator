@@ -14,18 +14,14 @@ Before running any command, please check/adjust
 To run the tool, just execute:
 
 ```
-python3 main.py
+virtualenv venv
+source venv/bin/activate
+pip install -r requirements.txt
 ```
 
 ## Dependencies
 
 This script was written in python 3.9 and not yet tested on other versions
-
-To install the needed packages, execute
-
-```
-pip3 install dateutil pyinquirer
-```
 
 ## Other tips
 
